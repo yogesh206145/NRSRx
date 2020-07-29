@@ -121,7 +121,12 @@ jobs:
   
   - task: SonarQubePrepare@4
     displayName: 'Publish Quality Gate Result'
- 
+  
+  - task: sonarcloud-buildbreaker@2
+    displayName: 'Break build on SonarCloud quality gate failure'
+    inputs:
+      SonarCloud: 'SonarCloud IkeMtz'
+      organization: 'ikemtz'
   
   - task: DotNetCoreCLI@2
     displayName: Pack Symbols
