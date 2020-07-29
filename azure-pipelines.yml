@@ -60,22 +60,12 @@ jobs:
       FileVersionNumber: '$(Build.BuildNumber)'
       InformationalVersion: '$(Build.BuildNumber)'
       PackageVersion: '$(Build.BuildNumber)'
-  
-  - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
-    displayName: 'Prepare analysis on SonarCloud'
+  - task: SonarQubePrepare@4
     inputs:
-      SonarCloud: 'SonarCloud IkeMtz'
-      organization: ikemtz
-      projectKey: NRSRx
-      projectName: NRSRx
-      extraProperties: |
-        # Additional properties that will be passed to the scanner,
-        # Put one key=value per line, example:
-        # sonar.cs.vstest.reportsPaths=$(Agent.WorkFolder)/_temp/*.trx
-        # sonar.branch.name=$(System.PullRequest.SourceBranch)
-        # sonar.branch.target=$(System.PullRequest.TargetBranch)
-        sonar.exclusions=templates/**
-        sonar.coverage.exclusions=templates/**
+      SonarQube: 'SonarQube'
+      scannerMode: 'MSBuild'
+      projectKey: 'tsp.yogesh'
+      projectName: 'tsp.yogesh'
   
   - task: DotNetCoreCLI@2
     displayName: 'dotnet build'
@@ -98,45 +88,12 @@ jobs:
       custom: 'test'
       arguments: '--logger trx --configuration $(BuildConfiguration) --collect "Code coverage" --no-build --no-restore --results-directory $(Common.TestResultsDirectory) --no-build --no-restore --settings $(Build.SourcesDirectory)/test.RunSettings --filter TestCategory!=Integration'
         
-  - task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@1
+  - task: SonarQubeAnalyze@4
     displayName: 'Run Code Analysis'
   
-  - task: SonarSource.sonarcloud.38b27399-a642-40af-bb7d-9971f69712e8.SonarCloudPublish@1
+  - task: SonarQubeAnalyze@4
     displayName: 'Publish Quality Gate Result'
-  
-  - task: sonarcloud-buildbreaker@2
-    displayName: 'Break build on SonarCloud quality gate failure'
-    inputs:
-      SonarCloud: 'SonarCloud IkeMtz'
-      organization: 'ikemtz'
-  
-  - task: DotNetCoreCLI@2
-    displayName: Pack Symbols
-    inputs:
-      command: 'pack'
-      packagesToPack: '$(PACKAGE_PROJECTS)'
-      configuration: 'Debug'
-      nobuild: true
-      includesymbols: true
-      includesource: true
-      versioningScheme: byBuildNumber
-      buildProperties: 'version-suffix=symbols'
-      verbosityPack: 'Minimal'
-  
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact'
-    inputs:
-      ArtifactName: 'symbol_drop'
-  
-  - task: GitTag@5
-    inputs:
-      workingdir: '$(SYSTEM.DEFAULTWORKINGDIRECTORY)'
-      tagUser: 'ikemtz'
-      tagEmail: 'ikemtz@outlook.com'
-      tag: 'nrsrx-$(build.buildNumber)'
-      tagMessage: 'nrsrx-$(build.buildNumber)'
-      useLightweightTags: true
-      conditions: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+ 
 trigger:
   batch: true
   branches:
