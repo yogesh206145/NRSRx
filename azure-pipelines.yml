@@ -71,14 +71,6 @@ jobs:
       FileVersionNumber: '$(Build.BuildNumber)'
       InformationalVersion: '$(Build.BuildNumber)'
       PackageVersion: '$(Build.BuildNumber)'
-
-      - task: SonarQubePrepare@4
-        inputs:
-          SonarQube: 'SonarQube'
-          scannerMode: 'MSBuild'
-          projectKey: 'tsp.yogesh'
-          projectName: 'tsp.yogesh'
-  
   - task: SonarQubePrepare@4
     displayName: 'Prepare analysis on SonarCloud'
     inputs:
